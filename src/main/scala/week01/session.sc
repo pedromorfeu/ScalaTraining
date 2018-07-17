@@ -1,24 +1,23 @@
-object session {
-  1 + 2
-  def abs(x: Double) = if (x < 0) -x else x
+object exercise {
+  def factorial(n: Int): Int = {
+    def loop(acc: Int, n: Int): Int =
+      if (n == 0) acc
+      else loop(acc * n, n - 1)
 
-  def sqrt(x: Double) = {
-
-    def sqrtIter(guess: Double): Double =
-      if (isGoodEnough(guess)) guess
-      else sqrtIter(improve(guess))
-
-    def isGoodEnough(guess: Double) =
-      abs(guess * guess - x) / x < 0.001
-
-    def improve(guess: Double) =
-      (guess + x / guess) / 2
-
-    sqrtIter(1.0)
+    loop(1, n)
   }
 
-  sqrt(2)
-  sqrt(4)
-  sqrt(1e-6)
-  sqrt(1e60)
+  factorial(4)
+
+  def sum(f: Int => Int, a: Int, b: Int): Int = {
+    def loop(a: Int, acc: Int): Int = {
+      if (a > b) acc
+      else loop(a + 1, acc + f(a))
+    }
+
+    loop(a, 0)
+  }
+
+  sum((x: Int) => x * x, 3, 5)
 }
+
