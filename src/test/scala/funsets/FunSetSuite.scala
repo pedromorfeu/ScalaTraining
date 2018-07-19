@@ -1,7 +1,9 @@
 package funsets
 
-import org.junit.runner.RunWith
 import org.scalatest.FunSuite
+
+
+import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 /**
@@ -130,6 +132,17 @@ class FunSetSuite extends FunSuite {
       assert(contains(d, 1), "Diff doesn't contain 1")
       assert(!contains(d, 2), "Diff contains 2")
       assert(!contains(d, 3), "Diff contains 3")
+    }
+  }
+
+  test("filter contains filtered elements only") {
+    new TestSets {
+      val s = union(s1, s2)
+      val t = union(s, s3) // (1,2,3)
+      val filtered: Set = filter(s, (x: Int) => x < 3)
+      assert(contains(filtered, 1), "Filter doesn't contain 1")
+      assert(contains(filtered, 2), "Filter doesn't contain 2")
+      assert(!contains(filtered, 3), "Filter contains 3")
     }
   }
 
