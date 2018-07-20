@@ -137,12 +137,30 @@ class FunSetSuite extends FunSuite {
 
   test("filter contains filtered elements only") {
     new TestSets {
-      val s = union(s1, s2)
-      val t = union(s, s3) // (1,2,3)
+      val s = union(union(s1, s2), s3) // (1,2,3)
       val filtered: Set = filter(s, (x: Int) => x < 3)
       assert(contains(filtered, 1), "Filter doesn't contain 1")
       assert(contains(filtered, 2), "Filter doesn't contain 2")
       assert(!contains(filtered, 3), "Filter contains 3")
+    }
+  }
+
+  test("forall tests all elements against a predicate") {
+    new TestSets {
+      val s = union(s1, s2) // (1,2)
+      assert(forall(s, (x: Int) => x < 3), "Forall says that not all elements are < 3")
+      val t = union(s, s3) // (1,2,3)
+      assert(!forall(t, (x: Int) => x < 3), "Forall says that all elements are < 3")
+    }
+  }
+
+  test("exists tests at least one element against a predicate") {
+    new TestSets {
+      val s = union(s1, s2) // (1,2)
+      assert(exists(s, (x: Int) => x == 1), "Exists says 1 doesn't exist")
+      assert(exists(s, (x: Int) => x == 2), "Exists says 2 doesn't exist")
+      assert(exists(s, (x: Int) => x != 2), "Exists says there aren't values different from 2")
+      assert(!exists(s, (x: Int) => x == 3), "Exists says 3 exists")
     }
   }
 
