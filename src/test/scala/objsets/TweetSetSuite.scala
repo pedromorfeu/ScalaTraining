@@ -8,6 +8,7 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class TweetSetSuite extends FunSuite {
+
   trait TestSets {
     val set1 = new Empty
     val set2 = set1.incl(new Tweet("a", "a body", 20))
@@ -39,36 +40,49 @@ class TweetSetSuite extends FunSuite {
     }
   }
 
+  test("filter: b on set5") {
+    new TestSets {
+      assert(size(set5.filter(tw => tw.user == "b")) === 1)
+    }
+  }
+
   test("filter: 20 on set5") {
     new TestSets {
       assert(size(set5.filter(tw => tw.retweets == 20)) === 2)
     }
   }
 
-  test("union: set4c and set4d") {
+  test("filter: <10 on set5") {
     new TestSets {
-      assert(size(set4c.union(set4d)) === 4)
+      assert(size(set5.filter(tw => tw.retweets < 10)) === 2)
     }
   }
 
-  test("union: with empty set (1)") {
-    new TestSets {
-      assert(size(set5.union(set1)) === 4)
-    }
-  }
+  //
+  //  test("union: set4c and set4d") {
+  //    new TestSets {
+  //      assert(size(set4c.union(set4d)) === 4)
+  //    }
+  //  }
+  //
+  //  test("union: with empty set (1)") {
+  //    new TestSets {
+  //      assert(size(set5.union(set1)) === 4)
+  //    }
+  //  }
+  //
+  //  test("union: with empty set (2)") {
+  //    new TestSets {
+  //      assert(size(set1.union(set5)) === 4)
+  //    }
+  //  }
+  //
+  //  test("descending: set5") {
+  //    new TestSets {
+  //      val trends = set5.descendingByRetweet
+  //      assert(!trends.isEmpty)
+  //      assert(trends.head.user == "a" || trends.head.user == "b")
+  //    }
+  //  }
 
-  test("union: with empty set (2)") {
-    new TestSets {
-      assert(size(set1.union(set5)) === 4)
-    }
-  }
-
-  test("descending: set5") {
-    new TestSets {
-      val trends = set5.descendingByRetweet
-      assert(!trends.isEmpty)
-      assert(trends.head.user == "a" || trends.head.user == "b")
-    }
-  }
-
-  }
+}
