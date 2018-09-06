@@ -58,24 +58,47 @@ class TweetSetSuite extends FunSuite {
     }
   }
 
-  //
-  //  test("union: set4c and set4d") {
-  //    new TestSets {
-  //      assert(size(set4c.union(set4d)) === 4)
-  //    }
-  //  }
-  //
-  //  test("union: with empty set (1)") {
-  //    new TestSets {
-  //      assert(size(set5.union(set1)) === 4)
-  //    }
-  //  }
-  //
-  //  test("union: with empty set (2)") {
-  //    new TestSets {
-  //      assert(size(set1.union(set5)) === 4)
-  //    }
-  //  }
+  test("filter: true on set5") {
+    new TestSets {
+      assert(size(set5.filter(tw => true)) == 4)
+    }
+  }
+
+  test("filter: false on set5") {
+    new TestSets {
+      assert(size(set5.filter(tw => false)) == 0)
+    }
+  }
+
+  test("union: set4c and set4d") {
+    new TestSets {
+      assert(size(set4c.union(set4d)) === 4)
+    }
+  }
+
+  test("union: set4d and set5") {
+    new TestSets {
+      assert(size(set4d.union(set5)) === 4)
+    }
+  }
+
+  test("union: set5 and set4d") {
+    new TestSets {
+      assert(size(set5.union(set4d)) === 4)
+    }
+  }
+
+  test("union: with empty set (1)") {
+    new TestSets {
+      assert(size(set5.union(set1)) === 4)
+    }
+  }
+
+  test("union: with empty set (2)") {
+    new TestSets {
+      assert(size(set1.union(set5)) === 4)
+    }
+  }
   //
   //  test("descending: set5") {
   //    new TestSets {
