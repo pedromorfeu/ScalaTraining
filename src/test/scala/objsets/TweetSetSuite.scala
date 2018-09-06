@@ -17,7 +17,7 @@ class TweetSetSuite extends FunSuite {
     val d = new Tweet("d", "d body", 9)
     val set4c = set3.incl(c)
     val set4d = set3.incl(d)
-    val set5 = set4c.incl(d)
+    val set5: TweetSet = set4c.incl(d)
   }
 
   def asSet(tweets: TweetSet): Set[Tweet] = {
@@ -99,13 +99,36 @@ class TweetSetSuite extends FunSuite {
       assert(size(set1.union(set5)) === 4)
     }
   }
-  //
-  //  test("descending: set5") {
-  //    new TestSets {
-  //      val trends = set5.descendingByRetweet
-  //      assert(!trends.isEmpty)
-  //      assert(trends.head.user == "a" || trends.head.user == "b")
-  //    }
-  //  }
+
+  test("mostRetweeted: exception on empty") {
+    new TestSets {
+      try {
+        val retweeted: Tweet = set1.mostRetweeted
+        fail()
+      } catch {
+        case e: java.util.NoSuchElementException => // ok
+      }
+    }
+  }
+
+  test("mostRetweeted: b(20) on set 5") {
+    new TestSets {
+      val retweeted: Tweet = set5.mostRetweeted
+      assert(retweeted.user == "a")
+      assert(retweeted.retweets === 20)
+    }
+  }
+
+  test("descending: set5") {
+    new TestSets {
+      val trends: TweetList = set5.descendingByRetweet
+      trends.foreach(t => print(t.user + " "))
+      assert(!trends.isEmpty)
+      assert(trends.head.user == "a" || trends.head.user == "b")
+      assert(trends.tail.head.user == "a" || trends.tail.head.user == "b")
+      assert(trends.tail.tail.head.user == "d")
+      assert(trends.tail.tail.tail.head.user == "c")
+    }
+  }
 
 }

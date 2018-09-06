@@ -71,7 +71,7 @@ abstract class TweetSet {
     * Question: Should we implment this method here, or should it remain abstract
     * and be implemented in the subclasses?
     */
-  def mostRetweeted: Tweet = ???
+  def mostRetweeted: Tweet
 
   /**
     * Returns a list containing all tweets of this set, sorted by retweet count
@@ -82,7 +82,24 @@ abstract class TweetSet {
     * Question: Should we implment this method here, or should it remain abstract
     * and be implemented in the subclasses?
     */
-  def descendingByRetweet: TweetList = ???
+  def descendingByRetweet: TweetList = aux(Nil, this)
+
+  def aux(list: TweetList, set: TweetSet): TweetList = {
+    try {
+      var most: Tweet = set.mostRetweeted
+      new Cons(most, aux(list, set.remove(most)))
+    } catch {
+      case e: java.util.NoSuchElementException => {
+        list
+      }
+    }
+  }
+
+  override def toString: String = {
+    var s = ""
+    foreach(tweet => s += tweet.user + "-" + tweet.retweets + " ")
+    s
+  }
 
   /**
     * The following methods are already implemented
@@ -127,6 +144,8 @@ class Empty extends TweetSet {
   def remove(tweet: Tweet): TweetSet = this
 
   def foreach(f: Tweet => Unit): Unit = ()
+
+  def mostRetweeted: Tweet = throw new java.util.NoSuchElementException()
 }
 
 class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
@@ -163,6 +182,16 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
     f(elem)
     left.foreach(f)
     right.foreach(f)
+  }
+
+  def mostRetweeted: Tweet = {
+    var max = 0
+    var t = new Tweet("", "", 0)
+    foreach(tweet => if (tweet.retweets > max) {
+      max = tweet.retweets
+      t = tweet
+    })
+    t
   }
 }
 
