@@ -111,11 +111,11 @@ class TweetSetSuite extends FunSuite {
     }
   }
 
-  test("mostRetweeted: b(20) on set 5") {
+  test("mostRetweeted: a(20) or b(20) on set 5") {
     new TestSets {
-      val retweeted: Tweet = set5.mostRetweeted
-      assert(retweeted.user == "a")
-      assert(retweeted.retweets === 20)
+      val most: Tweet = set5.mostRetweeted
+      assert(most.user == "b")
+      assert(most.retweets === 20)
     }
   }
 

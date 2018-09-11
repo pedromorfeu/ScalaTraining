@@ -51,7 +51,7 @@ abstract class TweetSet {
   /**
     * Returns a new `TweetSet` that is the union of `TweetSet`s `this` and `that`.
     *
-    * Question: Should we implment this method here, or should it remain abstract
+    * Question: Should we implement this method here, or should it remain abstract
     * and be implemented in the subclasses?
     */
   def union(that: TweetSet): TweetSet = {
@@ -68,7 +68,7 @@ abstract class TweetSet {
     * Calling `mostRetweeted` on an empty set should throw an exception of
     * type `java.util.NoSuchElementException`.
     *
-    * Question: Should we implment this method here, or should it remain abstract
+    * Question: Should we implement this method here, or should it remain abstract
     * and be implemented in the subclasses?
     */
   def mostRetweeted: Tweet
@@ -79,26 +79,23 @@ abstract class TweetSet {
     * have the highest retweet count.
     *
     * Hint: the method `remove` on TweetSet will be very useful.
-    * Question: Should we implment this method here, or should it remain abstract
+    * Question: Should we implement this method here, or should it remain abstract
     * and be implemented in the subclasses?
     */
-  def descendingByRetweet: TweetList = aux(Nil, this)
+  def descendingByRetweet: TweetList = descending(Nil, this)
 
-  def aux(list: TweetList, set: TweetSet): TweetList = {
+  private def descending(list: TweetList, set: TweetSet): TweetList = {
     try {
-      var most: Tweet = set.mostRetweeted
-      new Cons(most, aux(list, set.remove(most)))
+      //println(set)
+      val most: Tweet = set.mostRetweeted
+      //println(set.total + " " + most)
+      new Cons(most, descending(list, set.remove(most)))
     } catch {
       case e: java.util.NoSuchElementException => {
+        //println("end")
         list
       }
     }
-  }
-
-  override def toString: String = {
-    var s = ""
-    foreach(tweet => s += tweet.user + "-" + tweet.retweets + " ")
-    s
   }
 
   /**
@@ -127,6 +124,12 @@ abstract class TweetSet {
     * This method takes a function and applies it to every element in the set.
     */
   def foreach(f: Tweet => Unit): Unit
+
+  def total: Int = {
+    var total = 0
+    foreach(t => total = total + 1)
+    total
+  }
 }
 
 class Empty extends TweetSet {
@@ -187,7 +190,7 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
   def mostRetweeted: Tweet = {
     var max = 0
     var t = new Tweet("", "", 0)
-    foreach(tweet => if (tweet.retweets > max) {
+    foreach(tweet => if (tweet.retweets >= max) {
       max = tweet.retweets
       t = tweet
     })
@@ -207,6 +210,12 @@ trait TweetList {
       f(head)
       tail.foreach(f)
     }
+
+  def total: Int = {
+    var total = 0
+    foreach(t => total = total + 1)
+    total
+  }
 }
 
 object Nil extends TweetList {
@@ -226,17 +235,31 @@ object GoogleVsApple {
   val google = List("android", "Android", "galaxy", "Galaxy", "nexus", "Nexus")
   val apple = List("ios", "iOS", "iphone", "iPhone", "ipad", "iPad")
 
-  lazy val googleTweets: TweetSet = ???
-  lazy val appleTweets: TweetSet = ???
+  private val allTweets: TweetSet = TweetReader.allTweets
+
+  lazy val googleTweets: TweetSet = allTweets.filter(tweet => google.exists(word => tweet.text.contains(word)))
+  lazy val appleTweets: TweetSet = allTweets.filter(tweet => apple.exists(word => tweet.text.contains(word)))
 
   /**
     * A list of all tweets mentioning a keyword from either apple or google,
     * sorted by the number of retweets.
     */
-  lazy val trending: TweetList = ???
+  lazy val trending: TweetList = googleTweets
+    .union(appleTweets)
+    .descendingByRetweet
 }
 
 object Main extends App {
+  println(TweetReader.allTweets.total)
+
   // Print the trending tweets
+  println(GoogleVsApple.googleTweets.total)
+  println(GoogleVsApple.appleTweets.total)
+
+  println(GoogleVsApple.googleTweets.mostRetweeted)
+  println(GoogleVsApple.appleTweets.mostRetweeted)
+  println(GoogleVsApple.googleTweets.union(GoogleVsApple.appleTweets).descendingByRetweet)
+
+  println("trending")
   GoogleVsApple.trending foreach println
 }
