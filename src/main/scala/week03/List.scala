@@ -18,5 +18,12 @@ class Nil[T] extends List[T] {
   override def tail: Nothing = throw new NoSuchElementException("Nil.tail")
 }
 
+object List {
 
+  // List(1, 2) --> List.apply(1, 2)
 
+  def apply[T](): List[T] = new Nil
+  def apply[T](x: T): List[T] = new Cons(x, new Nil)
+  def apply[T](x: T, y: T): List[T] = new Cons(x, new Cons(y, new Nil))
+
+}

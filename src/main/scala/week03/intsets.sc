@@ -34,5 +34,10 @@ object intsets {
     override def union(other: IntSet) =
       ((left union right) union other) incl elem
   }
+
+  val a: Array[NonEmpty] = Array(new NonEmpty(1, Empty, Empty))
+  val b: Array[IntSet] = a
+
+
 }
 
