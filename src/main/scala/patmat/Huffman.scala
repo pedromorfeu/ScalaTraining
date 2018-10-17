@@ -30,7 +30,7 @@ object Huffman {
   }
 
   def chars(tree: CodeTree): List[Char] = tree match {
-    case Fork(left, right, c, weight) => chars(left) ++ chars(right)
+    case Fork(left, right, c, weight) => chars(left) ::: chars(right)
     case Leaf(char, weight) => List(char)
   }
 
@@ -121,7 +121,7 @@ object Huffman {
     * the example invocation. Also define the return type of the `until` function.
     *  - try to find sensible parameter names for `xxx`, `yyy` and `zzz`.
     */
-  def until(xxx: ???, yyy: ???)(zzz: ???): ??? = ???
+  //  def until(xxx: ???, yyy: ???)(zzz: ???): ??? = ???
 
   /**
     * This function creates a code tree which is optimal to encode the text `chars`.
