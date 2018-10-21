@@ -137,11 +137,13 @@ object Huffman {
     * the example invocation. Also define the return type of the `until` function.
     *  - try to find sensible parameter names for `xxx`, `yyy` and `zzz`.
     */
-  def until(stopFunction: List[CodeTree] => Boolean, combineFunction: List[CodeTree] => List[CodeTree])(trees: List[CodeTree]): List[CodeTree] =
-    if (stopFunction(trees)) trees
+  def until(singletonFunction: List[CodeTree] => Boolean,
+            combineFunction: List[CodeTree] => List[CodeTree])
+           (trees: List[CodeTree]): List[CodeTree] =
+    if (singletonFunction(trees)) trees
     else {
       val combined: List[CodeTree] = combineFunction(trees)
-      until(stopFunction, combineFunction)(combined)
+      until(singletonFunction, combineFunction)(combined)
     }
 
   /**
@@ -150,18 +152,39 @@ object Huffman {
     * The parameter `chars` is an arbitrary text. This function extracts the character
     * frequencies from that text and creates a code tree based on them.
     */
-  def createCodeTree(chars: List[Char]): CodeTree = ???
+  def createCodeTree(chars: List[Char]): CodeTree = {
+    val frequencies: List[(Char, Int)] = times(chars)
+    val leaves: List[Leaf] = makeOrderedLeafList(frequencies)
+    val trees: List[CodeTree] = until(singleton, combine)(leaves)
+    trees(0)
+  }
 
 
   // Part 3: Decoding
 
   type Bit = Int
 
+  def search(tree: CodeTree, bits: List[Bit]): Char = tree match {
+    case Leaf(char, _) => char
+    case Fork(left, right, chars, weight) => if (bits.head == 0) search(left, bits.tail) else search(right, bits.tail)
+  }
+
   /**
     * This function decodes the bit sequence `bits` using the code tree `tree` and returns
     * the resulting list of characters.
     */
-  def decode(tree: CodeTree, bits: List[Bit]): List[Char] = ???
+  def decode(tree: CodeTree, bits: List[Bit]): List[Char] = decode(tree, tree, bits)
+
+  def decode(tree: CodeTree, partialTree: CodeTree, bits: List[Bit]): List[Char] =
+  // for each bit, look for the corresponding char in the tree
+    if (bits.isEmpty) List()
+    else {
+      var bits1 = bits.tail
+      partialTree match {
+        case Leaf(char, _) => List(char) ::: decode(tree, tree, bits.tail)
+        case Fork(left, right, chars, weight) => if (bits.head == 0) decode(tree, left, bits.tail) else decode(tree, right, bits.tail)
+      }
+    }
 
   /**
     * A Huffman coding tree for the French language.

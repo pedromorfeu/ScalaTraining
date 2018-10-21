@@ -61,11 +61,43 @@ class HuffmanSuite extends FunSuite {
   test("combine of some leaf list") {
     val leaflist = List(Leaf('e', 1), Leaf('t', 2), Leaf('x', 4))
     assert(combine(leaflist) === List(Fork(Leaf('e', 1), Leaf('t', 2), List('e', 't'), 3), Leaf('x', 4)))
+
+    val leaflist2 = List(Leaf('e', 1), Leaf('t', 2), Leaf('x', 4), Leaf('z', 6))
+    assert(combine(leaflist2) === List(
+      Fork(Leaf('e', 1), Leaf('t', 2), List('e', 't'), 3),
+      Fork(Leaf('x', 4), Leaf('z', 6), List('x', 'z'), 10)
+    ))
   }
 
   test("until of some tree") {
     new TestTrees {
-      println(until(singleton, combine)(List(t1)))
+      assert(until(singleton, combine)(List(t1, Leaf('d', 4))) == List(t2))
+    }
+  }
+
+  test("create a code tree") {
+    println(createCodeTree(string2Chars("a")))
+    println(createCodeTree(string2Chars("ab")))
+    println(createCodeTree(string2Chars("aba")))
+    println(createCodeTree(string2Chars("abaab")))
+    println(createCodeTree(string2Chars("abacab")))
+  }
+
+  test("search a bit") {
+    new TestTrees {
+      assert(search(t1, List(0)) == 'a')
+      assert(search(t1, List(1)) == 'b')
+      assert(search(t2, List(1)) == 'd')
+    }
+  }
+
+  test("decode some bits") {
+    new TestTrees {
+      assert(decode(t1, List(0)) == List('a'))
+      assert(decode(t1, List(1)) == List('b'))
+      assert(decode(t2, List(1)) == List('d'))
+      assert(decode(t2, List(0, 1)) == List('b'))
+      assert(decode(t2, List(0, 0)) == List('a'))
     }
   }
 
