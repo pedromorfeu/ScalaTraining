@@ -15,4 +15,17 @@ object session {
   case class Number(n: Int)
 
   Number(1).n
+
+  val number = Number(1)
+  number match {
+    case Number(1) => println("one")
+    case Number(_) => println("else")
+  }
+
+  val char = 'b'
+  char match {
+    case 'a' => println("one")
+    case _ => println("else")
+  }
+
 }

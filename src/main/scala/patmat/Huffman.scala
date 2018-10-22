@@ -164,11 +164,6 @@ object Huffman {
 
   type Bit = Int
 
-  def search(tree: CodeTree, bits: List[Bit]): Char = tree match {
-    case Leaf(char, _) => char
-    case Fork(left, right, chars, weight) => if (bits.head == 0) search(left, bits.tail) else search(right, bits.tail)
-  }
-
   /**
     * This function decodes the bit sequence `bits` using the code tree `tree` and returns
     * the resulting list of characters.
@@ -177,12 +172,15 @@ object Huffman {
 
   def decode(tree: CodeTree, partialTree: CodeTree, bits: List[Bit]): List[Char] =
   // for each bit, look for the corresponding char in the tree
-    if (bits.isEmpty) List()
-    else {
-      var bits1 = bits.tail
-      partialTree match {
-        case Leaf(char, _) => List(char) ::: decode(tree, tree, bits.tail)
-        case Fork(left, right, chars, weight) => if (bits.head == 0) decode(tree, left, bits.tail) else decode(tree, right, bits.tail)
+    partialTree match {
+      case Leaf(char, _) => {
+        if (bits.isEmpty) List(char)
+        else List(char) ::: decode(tree, tree, bits.tail)
+      }
+      case Fork(left, right, chars, weight) => {
+        if (bits.isEmpty) List()
+        else if (bits.head == 0) decode(tree, left, bits.tail)
+        else decode(tree, right, bits.tail)
       }
     }
 
@@ -202,10 +200,20 @@ object Huffman {
   /**
     * Write a function that returns the decoded secret
     */
-  def decodedSecret: List[Char] = ???
+  def decodedSecret: List[Char] = decode(frenchCode, secret)
 
 
   // Part 4a: Encoding using Huffman tree
+
+  def getChars(tree: CodeTree, bits: List[Bit]): Char = tree match {
+    case Leaf(char, _) => char
+    case Fork(left, right, chars, weight) => if (bits.head == 0) getChars(left, bits.tail) else getChars(right, bits.tail)
+  }
+
+  def getBits(tree: CodeTree, char: Char, bits: List[Bit]): List[Bit] = tree match {
+    case Leaf(c, weight) => if (char == c) bits else List()
+    case Fork(left, right, chars, weight) => getBits(left, char, bits ::: List(0)) ::: getBits(right, char, bits ::: List(1))
+  }
 
   /**
     * This function encodes `text` using the code tree `tree`

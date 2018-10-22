@@ -83,21 +83,38 @@ class HuffmanSuite extends FunSuite {
     println(createCodeTree(string2Chars("abacab")))
   }
 
-  test("search a bit") {
-    new TestTrees {
-      assert(search(t1, List(0)) == 'a')
-      assert(search(t1, List(1)) == 'b')
-      assert(search(t2, List(1)) == 'd')
-    }
-  }
-
   test("decode some bits") {
     new TestTrees {
+      assert(decode(t1, List()) == List())
       assert(decode(t1, List(0)) == List('a'))
       assert(decode(t1, List(1)) == List('b'))
       assert(decode(t2, List(1)) == List('d'))
       assert(decode(t2, List(0, 1)) == List('b'))
       assert(decode(t2, List(0, 0)) == List('a'))
+    }
+  }
+
+  test("decoded secret") {
+    println(decodedSecret)
+  }
+
+  test("get chars") {
+    new TestTrees {
+      assert(getChars(t1, List(0)) == 'a')
+      assert(getChars(t1, List(1)) == 'b')
+      assert(getChars(t2, List(0, 0)) == 'a')
+      assert(getChars(t2, List(0, 1)) == 'b')
+      assert(getChars(t2, List(1)) == 'd')
+    }
+  }
+
+  test("get bits") {
+    new TestTrees {
+      assert(getBits(t1, 'a', List()) == List(0))
+      assert(getBits(t1, 'b', List()) == List(1))
+      assert(getBits(t2, 'a', List()) == List(0, 0))
+      assert(getBits(t2, 'b', List()) == List(0, 1))
+      assert(getBits(t2, 'd', List()) == List(1))
     }
   }
 
