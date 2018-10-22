@@ -88,9 +88,11 @@ class HuffmanSuite extends FunSuite {
       assert(decode(t1, List()) == List())
       assert(decode(t1, List(0)) == List('a'))
       assert(decode(t1, List(1)) == List('b'))
+      assert(decode(t1, List(0, 1)) == List('a', 'b'))
       assert(decode(t2, List(1)) == List('d'))
       assert(decode(t2, List(0, 1)) == List('b'))
       assert(decode(t2, List(0, 0)) == List('a'))
+      assert(decode(t2, List(0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1)) == List('a', 'a', 'a', 'b', 'a', 'd'))
     }
   }
 
@@ -100,27 +102,70 @@ class HuffmanSuite extends FunSuite {
 
   test("get chars") {
     new TestTrees {
-      assert(getChars(t1, List(0)) == 'a')
-      assert(getChars(t1, List(1)) == 'b')
-      assert(getChars(t2, List(0, 0)) == 'a')
-      assert(getChars(t2, List(0, 1)) == 'b')
-      assert(getChars(t2, List(1)) == 'd')
+      assert(getChar(t1, List(0)) == 'a')
+      assert(getChar(t1, List(1)) == 'b')
+      assert(getChar(t2, List(0, 0)) == 'a')
+      assert(getChar(t2, List(0, 1)) == 'b')
+      assert(getChar(t2, List(1)) == 'd')
     }
   }
 
   test("get bits") {
     new TestTrees {
-      assert(getBits(t1, 'a', List()) == List(0))
-      assert(getBits(t1, 'b', List()) == List(1))
-      assert(getBits(t2, 'a', List()) == List(0, 0))
-      assert(getBits(t2, 'b', List()) == List(0, 1))
-      assert(getBits(t2, 'd', List()) == List(1))
+      assert(getBits(t1, 'a') == List(0))
+      assert(getBits(t1, 'b') == List(1))
+      assert(getBits(t2, 'a') == List(0, 0))
+      assert(getBits(t2, 'b') == List(0, 1))
+      assert(getBits(t2, 'd') == List(1))
+    }
+  }
+
+  test("encode some text") {
+    new TestTrees {
+      assert(encode(t1)(List()) == List())
+      assert(encode(t1)(List('a')) == List(0))
+      assert(encode(t1)(List('b')) == List(1))
+      assert(encode(t1)("ab".toList) == List(0, 1))
+      assert(encode(t2)(List('a')) == List(0, 0))
+      assert(encode(t2)("aaa".toList) == List(0, 0, 0, 0, 0, 0))
+      assert(encode(t2)("aaabad".toList) == List(0, 0, 0, 0, 0, 0, 0, 1, 0 ,0, 1))
     }
   }
 
   test("decode and encode a very short text should be identity") {
     new TestTrees {
       assert(decode(t1, encode(t1)("ab".toList)) === "ab".toList)
+      assert(decode(t2, encode(t2)("aaabad".toList)) === "aaabad".toList)
+    }
+  }
+
+  test("code bits from a table") {
+    val table: CodeTable = List(('a', List(0, 0)), ('b', List(0, 1)), ('d', List(1)))
+    assert(codeBits(table)('b') == List(0, 1))
+  }
+
+  test("merge some tables") {
+    val table1: CodeTable = List(('a', List(0, 0)), ('b', List(0, 1)), ('d', List(1)))
+    val table2: CodeTable = List(('c', List(0, 1, 1)), ('b', List(0, 1)), ('d', List(1)))
+    assert(mergeCodeTables(table1, table2) == List(('c', List(0, 1, 1)), ('a', List(0, 0)), ('b', List(0, 1)), ('d', List(1))))
+  }
+
+  test("convert tree to table") {
+    new TestTrees {
+      assert(convert(t1) == List(('a', List(0)), ('b', List(1))))
+      assert(convert(t2) == List(('a', List(0, 0)), ('b', List(0, 1)), ('d', List(1))))
+    }
+  }
+
+  test("quick encode") {
+    new TestTrees {
+      assert(quickEncode(t1)(List()) == List())
+      assert(quickEncode(t1)(List('a')) == List(0))
+      assert(quickEncode(t1)(List('b')) == List(1))
+      assert(quickEncode(t1)("ab".toList) == List(0, 1))
+      assert(quickEncode(t2)(List('a')) == List(0, 0))
+      assert(quickEncode(t2)("aaa".toList) == List(0, 0, 0, 0, 0, 0))
+      assert(quickEncode(t2)("aaabad".toList) == List(0, 0, 0, 0, 0, 0, 0, 1, 0 ,0, 1))
     }
   }
 
