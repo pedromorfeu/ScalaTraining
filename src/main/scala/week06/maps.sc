@@ -33,23 +33,8 @@ Map("a"->1, "b"->2, "c"->3).toList
 
 val l = List(("a",1),("b",2),("c",3))
 
-def freq1(chars: List[Char]): List[(Char, Int)] = {
-  chars.sorted match {
-    case List() => List()
-    case c :: cs => freq(cs, c, 1)
-  }
-}
+val list = "abca".groupBy(t => t).toList
+val tuples = for ((c,n) <- list) yield (c, n.length)
+tuples.sorted
 
-def freq(chars: List[Char], previous: Char, n: Int): List[(Char, Int)] = chars match {
-  case List() => List((previous, n))
-  case c :: cs => {
-    if (c == previous) {
-      freq(cs, c, n+1)
-    } else {
-      List((previous, n)) ::: freq(cs, c, 1)
-    }
-  }
-}
-
-freq1(List('a','a','b','a'))
-freq1(List('a','a','b','a','c','b'))
+"Robert".toLowerCase.groupBy(t => t).toList.sortBy(t => t._1)

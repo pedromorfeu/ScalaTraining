@@ -45,3 +45,24 @@ def flatten(xs: List[Any]): List[Any] = xs match {
   }
 }
 flatten(List(List(1, 1), 2, List(3, List(5, 8))))
+
+def freq1(chars: List[Char]): List[(Char, Int)] = {
+  chars.sorted match {
+    case List() => List()
+    case c :: cs => freq(cs, c, 1)
+  }
+}
+
+def freq(chars: List[Char], previous: Char, n: Int): List[(Char, Int)] = chars match {
+  case List() => List((previous, n))
+  case c :: cs => {
+    if (c == previous) {
+      freq(cs, c, n+1)
+    } else {
+      List((previous, n)) ::: freq(cs, c, 1)
+    }
+  }
+}
+
+freq1(List('a','a','b','a'))
+freq1(List('a','a','b','a','c','b'))
