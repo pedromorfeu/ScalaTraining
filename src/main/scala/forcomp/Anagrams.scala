@@ -41,7 +41,7 @@ object Anagrams {
   }
 
   /** Converts a sentence into its character occurrence list. */
-  def sentenceOccurrences(s: Sentence): Occurrences = s flatMap wordOccurrences
+  def sentenceOccurrences(s: Sentence): Occurrences = wordOccurrences(s mkString)
 
   /** The `dictionaryByOccurrences` is a `Map` from different occurrences to a sequence of all
     *  the words that have that occurrence count.
@@ -85,7 +85,19 @@ object Anagrams {
     *  Note that the order of the occurrence list subsets does not matter -- the subsets
     *  in the example above could have been displayed in some other order.
     */
-  def combinations(occurrences: Occurrences): List[Occurrences] = ???
+  def combinations(occurrences: Occurrences): List[Occurrences] =
+    occurrences match {
+      case Nil => List(Nil)
+      case (c, n) :: os =>
+        (for (ix <- 1 to n) yield List((c, ix))).toList :::
+          (os match {
+            case Nil => combinations(os)
+            case (c1, n1) :: o1s => (for {
+              a <- 1 to n
+              b <- 1 to n1
+            } yield List((c, a), (c1, b))).toList
+          }) ::: combinations(os)
+    }
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
     *
@@ -97,7 +109,10 @@ object Anagrams {
     *  Note: the resulting value is an occurrence - meaning it is sorted
     *  and has no zero-entries.
     */
-  def subtract(x: Occurrences, y: Occurrences): Occurrences = ???
+  def subtract(x: Occurrences, y: Occurrences): Occurrences = {
+    val result = x.filter(!y.contains(_)).map(o => o._1).mkString
+    wordOccurrences(result)
+  }
 
   /** Returns a list of all anagram sentences of the given sentence.
     *
@@ -139,5 +154,12 @@ object Anagrams {
     *
     *  Note: There is only one anagram of an empty sentence.
     */
-  def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
+  def sentenceAnagrams(sentence: Sentence): List[Sentence] = sentence match {
+    case Nil => List(Nil)
+    case s :: ss => {
+      val occurrences = sentenceOccurrences(sentence)
+      val comb = combinations(occurrences)
+      for (c <- comb) yield dictionaryByOccurrences(c)
+    }
+  }
 }
