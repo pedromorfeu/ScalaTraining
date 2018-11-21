@@ -85,19 +85,30 @@ object Anagrams {
     *  Note that the order of the occurrence list subsets does not matter -- the subsets
     *  in the example above could have been displayed in some other order.
     */
-  def combinations(occurrences: Occurrences): List[Occurrences] =
-    occurrences match {
-      case Nil => List(Nil)
-      case (c, n) :: os =>
-        (for (ix <- 1 to n) yield List((c, ix))).toList :::
-          (os match {
-            case Nil => combinations(os)
-            case (c1, n1) :: o1s => (for {
-              a <- 1 to n
-              b <- 1 to n1
-            } yield List((c, a), (c1, b))).toList
-          }) ::: combinations(os)
-    }
+  def combinations1(occurrences: Occurrences): List[Occurrences] = occurrences match {
+    case Nil => List(Nil)
+    case (c, n) :: os =>
+      (for (ix <- 1 to n) yield List((c, ix))).toList :::
+        (os match {
+          case Nil => combinations1(os)
+          case (c1, n1) :: o1s => (for {
+            a <- 1 to n
+            b <- 1 to n1
+          } yield List((c, a), (c1, b))).toList
+        }) ::: combinations1(os)
+  }
+
+  def combinations(occurrences: Occurrences): List[Occurrences] = {
+    val list = occurrences flatMap (t => {
+      for (i <- 1 to t._2) yield (t._1, i)
+    })
+    val l2 = list.toSet.subsets.map(_.toList.sorted).toList
+    l2.filter(l => allDifferent(l))
+  }
+
+  def allDifferent(l: List[(Char, Int)]): Boolean =
+    (l map (_._1) toSet).size == l.size
+
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
     *
@@ -154,12 +165,20 @@ object Anagrams {
     *
     *  Note: There is only one anagram of an empty sentence.
     */
-  def sentenceAnagrams(sentence: Sentence): List[Sentence] = sentence match {
-    case Nil => List(Nil)
-    case s :: ss => {
-      val occurrences = sentenceOccurrences(sentence)
-      val comb = combinations(occurrences)
-      for (c <- comb) yield dictionaryByOccurrences(c)
-    }
+  def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
+    val occurrences = sentenceOccurrences(sentence)
+    val comb = combinations(occurrences)
+    comb
+      .filter(dictionaryByOccurrences.get(_).isDefined)
+      .map(dictionaryByOccurrences.get(_).get)
   }
+
+  def main(args: Array[String]): Unit = {
+
+    sentenceAnagrams(List("yes", "man"))
+      .foreach(println(_))
+
+
+  }
+
 }
